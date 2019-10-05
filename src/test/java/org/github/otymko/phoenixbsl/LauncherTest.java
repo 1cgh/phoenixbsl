@@ -8,7 +8,9 @@ public class LauncherTest {
   @Test
   public void test() throws AutomationException {
 
-    //Launcher.main(null);
+    Launcher.main(null);
+    //String[] args = {};
+    //Application.launch(IssuesFormApplication.class);
 
   }
 

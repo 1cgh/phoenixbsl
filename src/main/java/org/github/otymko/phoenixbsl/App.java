@@ -1,5 +1,7 @@
 package org.github.otymko.phoenixbsl;
 
+import javafx.application.Application;
+import javafx.stage.Stage;
 import mmarquee.automation.AutomationException;
 import mmarquee.automation.Element;
 import mmarquee.automation.UIAutomation;
@@ -11,19 +13,22 @@ import org.github._1c_syntax.bsl.languageserver.context.ServerContext;
 import org.github._1c_syntax.bsl.languageserver.providers.DiagnosticProvider;
 import org.github._1c_syntax.bsl.languageserver.providers.FormatProvider;
 import org.github.otymko.phoenixbsl.events.GlobalKeyboardHookHandler;
-import org.github.otymko.phoenixbsl.views.IssuesForm;
+import org.github.otymko.phoenixbsl.views.IssuesFormApplication;
 import org.github.otymko.phoenixbsl.views.Toolbar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class App {
+public class App extends Application {
 
   private static final Logger log = LoggerFactory.getLogger(App.class);
+
+  private static final App INSTANCE = new App();
 
   private final String FAKE_PATH_FILE = "module.bsl";
   private final String REGEX_FORM_TITLE = "Конфигуратор|Designer";
@@ -36,13 +41,21 @@ public class App {
   private UIAutomation automation;
   private DiagnosticProvider diagnosticProvider;
 
-  private int thisIdProcess;
+  private int thisIdProcess = 0;
   private Window thisForm;
   private Element focusElement;
   private String tmpTextModule;
 
   public App() {
-    thisIdProcess = 0;
+  }
+
+  public static App getInstance() {
+    return INSTANCE;
+  }
+
+  @Override
+  public void start(Stage primaryStage) throws Exception {
+    // пустой
   }
 
   public void run() {
@@ -61,11 +74,32 @@ public class App {
       return;
     }
 
+//    ServerContext bslServerContext = new ServerContext();
+//    DocumentContext documentContext = bslServerContext.addDocument(fakeFile.toURI().toString(), moduleText);
+//    List<Diagnostic> list = diagnosticProvider.computeDiagnostics(documentContext);
+//
+//    String[] arg = {moduleText};
+    Application.launch(IssuesFormApplication.class);
+
+  }
+
+  public List<Diagnostic> getDiagnosticByModule(String moduleText) {
     ServerContext bslServerContext = new ServerContext();
     DocumentContext documentContext = bslServerContext.addDocument(fakeFile.toURI().toString(), moduleText);
     List<Diagnostic> list = diagnosticProvider.computeDiagnostics(documentContext);
+    return list;
+  }
 
-    IssuesForm form = new IssuesForm(this, list);
+  public List<Diagnostic> getDiagnostics() {
+    String moduleText = getModuleText();
+    if (moduleText == null ) {
+      return new ArrayList<>();
+    }
+
+    ServerContext bslServerContext = new ServerContext();
+    DocumentContext documentContext = bslServerContext.addDocument(fakeFile.toURI().toString(), moduleText);
+    List<Diagnostic> list = diagnosticProvider.computeDiagnostics(documentContext);
+    return list;
   }
 
   public void checkFocusForm() {

@@ -15,6 +15,7 @@ public class IssuesForm extends JFrame {
   private DefaultListModel<Issue> listModel = new DefaultListModel<>();
 
   public IssuesForm(App app, List<Diagnostic> list) {
+
     super("Issues");
 
     this.app = app;
